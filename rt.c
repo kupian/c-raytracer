@@ -1,24 +1,53 @@
 #include <stdio.h>
 
-int main(void) {
+// horizontal and vertical rays
+#define N 30
+#define M 30
+
+int main(void)
+{
     double cx, cy, cz, r2; // x,y,z, radius squared
-    cx = 0.0 ; cy = 0.0 ; cz = 2.0 ; r2 = 1.5; 
+    {
+        char buffer[100];
+        puts("Please enter coordinates of the sphere centre x,y,z");
+        fgets(buffer, sizeof(buffer), stdin);
+        sscanf(buffer, "%lf,%lf,%lf", &cx, &cy, &cz);
+    
+        puts("Please enter the radius of the sphere");
+        fgets(buffer, sizeof(buffer), stdin);
+        sscanf(buffer, "%lf", &r2);
+        r2 *= r2;
+    }
 
     double ux, uy, uz, vx, vy, vz; // origin of line, unit vector direction
     ux = uy = uz = 0; // shoot ray from origin
-    vx = vy = 0; vz = 1.0; // ray goes along z direction
+    vx = vy = 0; vz = 1.0;
 
-    double Dx = ux - cx, Dy = uy - cy, Dz = uz - cz;
-    double D2 = Dx*Dx + Dy*Dy + Dz * Dz;
+    for (int j = 0; j < M; j++)
+    {
+        // rows
+        uy = (1 + 2 * j - M) / (double)M;
+        for (int i = 0; i < N; i++)
+        {
+            // elements of row
+            ux = (1 + 2 * i - N) * 4 / (double)N;
 
-    double vD = vx*Dx + vy*Dy + vz*Dz;
+            double Dx = ux - cx, Dy = uy - cy, Dz = uz - cz;
+            double D2 = Dx * Dx + Dy * Dy + Dz * Dz;
+            double vD = vx * Dx + vy * Dy + vz * Dz;
+            double disc = vD * vD - D2 + r2;
 
-    double disc = vD*vD - D2 + r2;
+            if (disc < 0)
+            { // discriminant is negative -> no intersection
+                printf(" ");
+            }
+            else
+            {
+                printf("X"); // a graze or a full intersection
+            }
+        }
+        printf("\n");
+    }
 
-    printf("The discriminant is %06.2f for the case of:\n", disc);
-    printf("Ray\torigin: (%06.2f, %06.2f, %06.2f)\n", ux, uy, uz);
-    printf("\tDirection: (%06.2f, %06.2f, %06.2f)\n", vx, vy, vz);
-    printf("Sphere\tcentre: (%06.2f, %06.2f, %06.2f)\n", cx, cy, cz);
-    printf("\tRadius squared: %06.2f\n", r2);
     return 0;
 }
